@@ -1,14 +1,33 @@
-import type { ChangeEvent } from "react"
+import { useEffect, useRef, useState, type ChangeEvent } from "react"
 import type { Hero } from "../types/hero"
+import { useParams } from "react-router-dom";
 
-type Props = {
-  hero?: Hero,
-  onChangeName: (event:ChangeEvent<HTMLInputElement>) => void,
-};
+const apiUrl = import.meta.env.VITE_API_URL;
 
-export default function HeroDetail({hero, onChangeName} : Props) {
+export default function HeroDetail() {
+  const [hero, setHero] = useState<Hero | null>(null);
+  const params = useParams();
+  const fetched = useRef(false);
+
+  useEffect(() => {
+    if (!fetched.current) {
+        fetch(`${apiUrl}/heroes/${params.id}`).then(res => {
+          return res.json();
+        }).then(data => {
+          setHero(data);
+        })
+        fetched.current = true;
+    }
+  }, [params.id]);
+  
   if (!hero) return null;
   
+  const handleNameChange = (event : ChangeEvent<HTMLInputElement>) => {
+    const updatedName = event.target.value;
+
+    setHero({...hero, name:updatedName});
+  }
+
   return (
       <>
         <h2 className='text-2xl'>Details</h2>
@@ -26,7 +45,7 @@ export default function HeroDetail({hero, onChangeName} : Props) {
           placeholder='name'
           className='border border-gray-300 rounded-lg p-2 w-1/4'
           value={hero.name}
-          onChange={onChangeName}
+          onChange={handleNameChange}
           />
         </div>
       </>
