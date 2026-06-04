@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import type { Hero } from "../types/hero";
 import { Link } from "react-router-dom";
-
-const apiUrl = import.meta.env.VITE_API_URL;
+import { useMessages } from "../context/messageContext";
 
 export default function HeroesList() {
 const [heroes, setHeroes] = useState<Hero[]>([]);
   const fetched = useRef(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  const {addMessage} = useMessages();
 
   useEffect(() => {
     if (!fetched.current) {
@@ -14,6 +16,7 @@ const [heroes, setHeroes] = useState<Hero[]>([]);
           return res.json();
         }).then(data => {
           setHeroes(data);
+          addMessage("Heroes loaded");
         })
         fetched.current = true;
     }

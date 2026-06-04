@@ -1,4 +1,4 @@
-import { createContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 
 type MessageContextType = {
     messages: string[];
@@ -11,9 +11,9 @@ const MessageContext = createContext<MessageContextType | undefined>(undefined);
 const MessageProvider = ({children} : {children:ReactNode}) => {
     const [messages, setMessages] = useState<string[]>([]);
 
-    const addMessage = (message:string) => {
+    const addMessage = useCallback((message:string) => {
         setMessages((prevMessages) => [...prevMessages, message]);
-    }
+    }, []);
 
     const clearMessages = () => {
         setMessages([]);
@@ -26,4 +26,14 @@ const MessageProvider = ({children} : {children:ReactNode}) => {
     )
 }
 
-export default MessageProvider;
+const useMessages = () => {
+    const context = useContext(MessageContext);
+
+    if (context === undefined) {
+        throw new Error("useMessages must be used within a MessageProvider");
+    }
+
+    return context;
+}
+
+export {MessageProvider, useMessages};

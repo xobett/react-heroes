@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react"
 import type { Hero } from "../types/hero"
 import { useParams } from "react-router-dom";
+import { useMessages } from "../context/messageContext";
 
-const apiUrl = import.meta.env.VITE_API_URL;
 
 export default function HeroDetail() {
   const [hero, setHero] = useState<Hero | null>(null);
   const params = useParams();
+
   const fetched = useRef(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
+  
+  const {addMessage} = useMessages();
 
   useEffect(() => {
     if (!fetched.current) {
@@ -15,6 +19,7 @@ export default function HeroDetail() {
           return res.json();
         }).then(data => {
           setHero(data);
+          addMessage(`Hero ${data.name} loaded`)
         })
         fetched.current = true;
     }

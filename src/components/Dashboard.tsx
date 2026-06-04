@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import type { Hero } from "../types/hero"
 import { Link } from "react-router-dom";
+import { useMessages } from "../context/messageContext";
 
 export default function Dashboard() {
     const [heroes, setHeroes] = useState<Hero[]>([]);
     const fetched = useRef(false);
+
+    const {addMessage} = useMessages();
 
     const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -14,6 +17,7 @@ export default function Dashboard() {
             return res.json();
         }).then(data => {
             setHeroes(data);
+            addMessage("Top heroes loaded")
         })
         fetched.current = true;
     }
