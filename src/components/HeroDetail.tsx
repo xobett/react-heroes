@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type SubmitEvent } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { Hero } from "../types/hero"
 import { useParams } from "react-router-dom";
 import { useMessages } from "../context/messageContext";
+import HeroForm from "./HeroForm";
 
 export default function HeroDetail() {
   const [hero, setHero] = useState<Hero | null>(null);
@@ -26,31 +27,6 @@ export default function HeroDetail() {
   
   if (!hero) return null;
 
-  const onSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const url = `${apiUrl}/heroes/${hero.id}/`;
-    try {
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({name: formData.get('name')})
-      });
-
-      if (!response.ok) throw new Error('Request failed ' + response.statusText);
-
-      const data = await response.json();
-      addMessage(`Hero ${hero.name} updated to ${data.name}`);
-      setHero(data);
-    } catch (error) {
-      console.log(error);
-      addMessage('Failed to update hero');
-    }
-  }
-
   return (
       <>
         <h2 className='text-2xl'>Details</h2>
@@ -62,21 +38,7 @@ export default function HeroDetail() {
           <span className='uppercase'>{hero.name}</span>
         </div>
         <div className='flex flex-col gap-2 mt-3 border-t'>
-          <form onSubmit={onSubmit}>
-            <label>Hero name</label>
-            <div className="flex gap-3">
-              <input
-              type="text"
-              name="name"
-              placeholder='name'
-              className='border border-gray-300 rounded-lg p-2 w-1/4'
-              defaultValue={hero.name}
-              />
-            </div>
-            <button type="submit" className="btn">
-              Submit
-            </button>
-          </form>
+          <HeroForm hero={hero} setHero={setHero}/>
         </div>
       </>
   )
